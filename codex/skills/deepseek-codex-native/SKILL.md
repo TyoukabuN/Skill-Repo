@@ -1,65 +1,71 @@
 ---
 name: deepseek-codex-native
-description: 帮助 Codex 用户把 DeepSeek 通过官方 Responses API 原生接入 Codex，并生成 switch-to-ds.ps1 与 switch-to-gpt.ps1 两个模型切换脚本。Use when the user asks to configure DeepSeek/DS for Codex, switch Codex between GPT and DeepSeek, repair DeepSeek Codex config, or package a repeatable DeepSeek Codex setup workflow.
+description: Use when the user asks to configure DeepSeek as a native Codex model provider through the official Responses API, switch Codex between GPT and DeepSeek, repair DeepSeek Codex configuration, or package a repeatable DeepSeek Codex setup workflow with switch-to-ds.ps1 and switch-to-gpt.ps1.
 ---
 
-# DeepSeek Codex 原生接入
+# DeepSeek Codex Native Integration
 
-## 目标
+## Goal
 
-把 DeepSeek 作为 Codex 的原生模型提供方接入，而不是通过 DeepSeek Code Worker MCP。这个模式会切换 Codex 主线程模型；它不等价于“GPT 规划、DeepSeek 执行”的双模型协同。需要 GPT 主线程 + DeepSeek 执行时，继续使用 `deepseek-code-worker` MCP。
+Connect DeepSeek as a native Codex model provider instead of using the DeepSeek Code Worker MCP.
 
-核心交付物：
+This mode switches the main Codex model provider. It is not the same as "GPT plans, DeepSeek executes" dual-model collaboration. If the user wants GPT as the main planner and DeepSeek as a worker, use the `deepseek-code-worker` MCP workflow instead.
 
-- 配置用户级 Codex 配置目录中的 DeepSeek provider。
-- 保留或生成可回滚的 GPT 配置快照。
-- 必须生成 `switch-to-ds.ps1` 和 `switch-to-gpt.ps1`，方便用户日常切换模型。
+Core deliverables:
 
-## 安全规则
+- Configure the user-level Codex config directory with a DeepSeek provider.
+- Preserve or create a rollback profile for GPT.
+- Create `switch-to-ds.ps1` and `switch-to-gpt.ps1` for daily model switching.
 
-不要在回复、日志、命令输出、补丁或仓库文件中暴露 DeepSeek API Key。DeepSeek 官方 Codex 接入示例可能会把 key 写入用户级 `config.toml`；在这么做之前，明确告知用户这是本机用户配置，不应提交到 Git。
+## Safety Rules
 
-所有配置默认写到用户级 Codex 目录：
+Never expose the DeepSeek API key in replies, logs, command output, patches, or repository files.
 
-- 如果 `$env:CODEX_HOME` 存在，使用它。
-- 否则 Windows 使用 `%USERPROFILE%\.codex`，类 Unix 使用 `~/.codex`。
+DeepSeek official Codex integration examples may write the key into the user-level `config.toml`. Before doing that, explicitly tell the user this is local user configuration and must not be committed to Git.
 
-除非用户明确要求，不要启动、重启或杀掉 Codex；只修改静态配置并告诉用户新开 Codex 进程后生效。
+Write configuration to the user-level Codex directory by default:
 
-## 接入流程
+- Use `$env:CODEX_HOME` when it exists.
+- Otherwise use `%USERPROFILE%\.codex` on Windows and `~/.codex` on Unix-like systems.
 
-1. 先查看 DeepSeek 官方文档的当前版本：
+Do not start, restart, or kill Codex unless the user explicitly asks. Modify static configuration and tell the user to open a new Codex process for changes to take effect.
+
+## Integration Workflow
+
+1. Check the current DeepSeek official documentation first:
    - `https://api-docs.deepseek.com/zh-cn/quick_start/agent_integrations/codex/`
    - `https://api-docs.deepseek.com/zh-cn/guides/responses_api/`
-2. 根据官方文档确认当前可用于 Codex Responses API 的模型名。不要假设 `deepseek-v4-flash` 或 `deepseek-v4-pro` 的支持状态永远不变。
-3. 读取现有 Codex 配置时必须脱敏：只判断是否存在 `model`、`model_provider`、`model_catalog_json`、`[model_providers.deepseek]`、`experimental_bearer_token` 等字段，不打印 token 值。
-4. 优先让用户在自己的终端交互式运行 DeepSeek 官方安装脚本并输入 API Key。若需要由 Codex 修改配置，先创建时间戳备份，并保留现有 MCP、profile、approval、sandbox 等无关配置段。
-5. 完成 DeepSeek 配置后，创建模型 profile 与两个切换脚本。
+2. Confirm the current model names supported for Codex Responses API from official documentation. Do not assume `deepseek-v4-flash`, `deepseek-v4-pro`, or any other model remains valid.
+3. When reading existing Codex config, redact secrets. Only report whether fields such as `model`, `model_provider`, `model_catalog_json`, `[model_providers.deepseek]`, and `experimental_bearer_token` exist. Do not print token values.
+4. Prefer having the user run DeepSeek's official setup script interactively in their own terminal and enter the API key themselves.
+5. If Codex must modify configuration directly, create a timestamped backup first and preserve unrelated MCP, profile, approval, sandbox, and other existing config sections.
+6. After DeepSeek configuration is complete, create model profiles and the two switch scripts.
 
-## 必须生成的文件
+## Required Files
 
-在用户级 Codex 目录下生成：
+Create these files under the user-level Codex directory:
 
 - `switch-to-ds.ps1`
 - `switch-to-gpt.ps1`
 
-同时创建：
+Also create:
 
 - `model-profiles/config.deepseek.toml`
 - `model-profiles/config.gpt.toml`
-- 如 DeepSeek 配置引用模型目录，也保存 `model-profiles/models.deepseek.json`
+- `model-profiles/models.deepseek.json`, when DeepSeek configuration references a model catalog file.
 
-脚本必须满足：
+Switch scripts must:
 
-- 使用脚本自身目录作为 Codex 目录，或显式解析 `$env:CODEX_HOME`；不要硬编码某个用户名。
-- 执行前检查必需文件是否存在，缺失时抛出清晰错误。
-- 如果当前已经是目标 provider，直接提示并退出，不重复覆盖。
-- 切换前把当前 `config.toml` 保存回对应 profile，保留用户后续手动调整。
-- `switch-to-ds.ps1` 先恢复 DeepSeek 的 `models.json`，再恢复 DeepSeek `config.toml`。
-- `switch-to-gpt.ps1` 恢复 GPT `config.toml`；不要把 DeepSeek API Key 打印出来。
-- 只切换配置文件，不自动启动 Codex。
+- Use the script directory as the Codex directory, or explicitly resolve `$env:CODEX_HOME`; do not hardcode a username.
+- Check required files before switching and fail with clear errors when they are missing.
+- Exit cleanly when the active config already points to the target provider.
+- Save the current `config.toml` back into the matching profile before switching, preserving later manual edits.
+- Restore DeepSeek `models.json` before restoring DeepSeek `config.toml` in `switch-to-ds.ps1`.
+- Restore GPT `config.toml` in `switch-to-gpt.ps1`.
+- Never print the DeepSeek API key.
+- Only switch config files; do not start Codex automatically.
 
-推荐脚本骨架逻辑：
+Recommended PowerShell skeleton:
 
 ```powershell
 $codexRoot = if ($env:CODEX_HOME) {
@@ -74,24 +80,24 @@ $gptProfile = Join-Path $profileDir 'config.gpt.toml'
 $dsProfile = Join-Path $profileDir 'config.deepseek.toml'
 ```
 
-在实际生成脚本时，把上面的骨架扩展为完整脚本，并按本机文件布局验证。
+When generating scripts, expand this skeleton into complete scripts and validate them against the local file layout.
 
-## 验证
+## Validation
 
-配置完成后做静态验证：
+After configuration, run static validation:
 
-- `config.toml` 的 `model_provider` 指向 DeepSeek 时，`wire_api` 应为官方文档要求的 Responses API 配置。
-- `experimental_bearer_token` 只能检查“非空/存在”，不能输出值。
-- `model_catalog_json` 指向的 JSON 文件存在且 JSON 语法有效。
-- GPT 与 DeepSeek profile 都存在。
-- 两个 `switch-to-*.ps1` 通过 PowerShell 语法检查。
+- When `config.toml` points `model_provider` to DeepSeek, `wire_api` must match the current official Responses API configuration.
+- `experimental_bearer_token` may only be checked for presence/non-empty value; never output it.
+- The file referenced by `model_catalog_json` exists and contains valid JSON.
+- GPT and DeepSeek profiles both exist.
+- Both `switch-to-*.ps1` scripts pass PowerShell syntax checks.
 
-如果用户允许产生 API 调用成本，再做一次最小 smoke test；否则只报告静态验证结果和“需要重启或新开 Codex 进程生效”。
+Run a minimal smoke test only when the user explicitly allows possible API cost. Otherwise report static validation results and explain that Codex must be restarted or reopened for changes to take effect.
 
-## 日常使用说明
+## User Instructions
 
-告诉用户：
+Tell the user:
 
-- 切到 DeepSeek：运行 `switch-to-ds.ps1`，然后重启 Codex 或新开一个 Codex 进程。
-- 切回 GPT：运行 `switch-to-gpt.ps1`，然后重启 Codex 或新开一个 Codex 进程。
-- DeepSeek 官方安装脚本中的“恢复默认/删除备份”选项用于卸载或重置，不适合作为日常切换方式。
+- To switch to DeepSeek, run `switch-to-ds.ps1`, then restart Codex or open a new Codex process.
+- To switch back to GPT, run `switch-to-gpt.ps1`, then restart Codex or open a new Codex process.
+- The "restore default" or "delete backup" option in DeepSeek's official setup script is for uninstall/reset flows, not daily switching.
