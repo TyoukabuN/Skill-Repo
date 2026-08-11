@@ -1,0 +1,4 @@
+interface:
+  display_name: "DeepSeek Codex 原生接入"
+  short_description: "为 Codex 配置 DeepSeek 并生成模型切换脚本"
+  default_prompt: "Use $deepseek-codex-native to connect Codex to DeepSeek and create GPT/DeepSeek switch scripts."
