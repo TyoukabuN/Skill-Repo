@@ -9,6 +9,11 @@ codex/
 ├─ agents/
 │  └─ luna-worker.toml
 └─ skills/
+   ├─ ace-step-bgm/
+   │  ├─ SKILL.md
+   │  └─ references/
+   │     ├─ ace-step-fields.md
+   │     └─ bgm-playbook.md
    ├─ deepseek-codex-native/
    │  ├─ SKILL.md
    │  └─ agents/
@@ -29,6 +34,7 @@ Future agent-specific assets can live in sibling folders such as `claude/`, `cur
 
 ### Codex
 
+- `ace-step-bgm`: Turn a rough BGM brief into one ACE-Step 1.5 caption plus four recommended style branches. Covers the caption/metadata field contract, instrumental BGM recipes, structure tags, and inference parameters.
 - `deepseek-codex-native`: Guidance for configuring DeepSeek as a native Codex model provider and creating GPT/DeepSeek switch scripts.
 - `refactor-doc-governance`: Guidance for long-running refactors, PRD/doc responsibility routing, dangerous-pattern checklists, and documentation normalization.
 - `sol-luna-dev`: Guidance for high-capability lead-agent planning, Luna worker implementation, and lead-agent review for code-changing tasks.
