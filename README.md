@@ -14,18 +14,45 @@ codex/
    │  └─ references/
    │     ├─ ace-step-fields.md
    │     └─ bgm-playbook.md
+   ├─ adaptive-project-development/
+   │  ├─ SKILL.md
+   │  ├─ agents/
+   │  │  └─ openai.yaml
+   │  ├─ assets/
+   │  │  └─ templates/
+   │  │     ├─ design.md
+   │  │     ├─ implementation-plan.md
+   │  │     ├─ prd.md
+   │  │     ├─ tasks.md
+   │  │     └─ verification.md
+   │  └─ references/
+   │     ├─ actiondbg-profile.md
+   │     ├─ artifact-contracts.md
+   │     ├─ readiness-and-review.md
+   │     ├─ role-handoffs.md
+   │     └─ workflow-routing.md
    ├─ deepseek-codex-native/
    │  ├─ SKILL.md
    │  └─ agents/
    │     └─ openai.yaml
+   ├─ refactor-doc-governance/
+   │  ├─ SKILL.md
+   │  └─ agents/
+   │     └─ openai.yaml
+   ├─ sol-luna-dev/
+   │  ├─ SKILL.md
+   │  ├─ agents/
+   │  │  └─ openai.yaml
+   │  └─ references/
+   │     └─ luna-worker-contract.md
    ├─ system-design-governance/
    │  ├─ SKILL.md
    │  └─ agents/
    │     └─ openai.yaml
-   └─ refactor-doc-governance/
+   └─ technical-flow-teacher/
       ├─ SKILL.md
-      └─ agents/
-         └─ openai.yaml
+      └─ references/
+         └─ flow-analysis-template.md
 ```
 
 Future agent-specific assets can live in sibling folders such as `claude/`, `cursor/`, or `gemini/` when needed.
