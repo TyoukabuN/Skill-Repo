@@ -35,6 +35,7 @@ Future agent-specific assets can live in sibling folders such as `claude/`, `cur
 ### Codex
 
 - `ace-step-bgm`: Turn a rough BGM brief into one ACE-Step 1.5 caption plus four recommended style branches. Covers the caption/metadata field contract, instrumental BGM recipes, structure tags, and inference parameters.
+- `adaptive-project-development`: Complexity-adaptive project workflow from PRD through design, implementation planning, bounded tasks, Luna-compatible implementation handoff, and independent review.
 - `deepseek-codex-native`: Guidance for configuring DeepSeek as a native Codex model provider and creating GPT/DeepSeek switch scripts.
 - `refactor-doc-governance`: Guidance for long-running refactors, PRD/doc responsibility routing, dangerous-pattern checklists, and documentation normalization.
 - `sol-luna-dev`: Guidance for high-capability lead-agent planning, Luna worker implementation, and lead-agent review for code-changing tasks.
@@ -45,6 +46,7 @@ Future agent-specific assets can live in sibling folders such as `claude/`, `cur
 Copy a skill folder into your local Codex skills directory:
 
 ```powershell
+Copy-Item -Recurse -Force .\codex\skills\adaptive-project-development "$env:USERPROFILE\.codex\skills\adaptive-project-development"
 Copy-Item -Recurse -Force .\codex\skills\deepseek-codex-native "$env:USERPROFILE\.codex\skills\deepseek-codex-native"
 Copy-Item -Recurse -Force .\codex\skills\refactor-doc-governance "$env:USERPROFILE\.codex\skills\refactor-doc-governance"
 Copy-Item -Recurse -Force .\codex\skills\sol-luna-dev "$env:USERPROFILE\.codex\skills\sol-luna-dev"
