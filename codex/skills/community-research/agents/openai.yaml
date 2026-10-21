@@ -1,0 +1,4 @@
+interface:
+  display_name: "Community Research"
+  short_description: "Research webpages with native tools and DeepSeek fallback"
+  default_prompt: "Use $community-research to investigate community and web sources, fall back to DeepSeek Search/Fetch when native tools fail, and cite the evidence with access limitations."
